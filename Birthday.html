@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Divya 🎉</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(180deg, #ffe6f0, #fff7ff);
+  }
+  h1 {
+    position: absolute;
+    top: 5%;
+    width: 100%;
+    text-align: center;
+    font-size: 3rem;
+    color: #ff69b4;
+    text-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4;
+    animation: glow 2s infinite alternate;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 1s;
+  }
+  #message {
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    color: #ff1493;
+    text-shadow: 0 0 5px #ff69b4;
+    z-index: 10;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4; }
+    to { text-shadow: 0 0 20px #ffb6c1, 0 0 40px #ff69b4; }
+  }
+  .cake {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 300px;
+    background: url('/cake.png') no-repeat center/contain;
+    animation: bounce 2s infinite ease-in-out;
+    z-index: 5;
+    cursor: pointer;
+  }
+  .candle {
+    position: absolute;
+    width: 12px;
+    height: 50px;
+    background: #fff;
+    top: -50px;
+    left: calc(50% - 6px);
+  }
+  .flame {
+    position: absolute;
+    top: -20px;
+    left: -6px;
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, #fff200 0%, #ff4500 70%, transparent 100%);
+    border-radius: 50%;
+    animation: flicker 0.3s infinite;
+  }
+  @keyframes flicker {
+    0% { transform: scale(1) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.2) rotate(10deg); opacity: 0.8; }
+    100% { transform: scale(1) rotate(-10deg); opacity: 1; }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -15px); }
+  }
+  .child {
+    position: absolute;
+    bottom: 20%;
+    width: 100px;
+    transition: transform 0.5s;
+    opacity: 1;
+  }
+  .child:nth-of-type(1) { left: 10%; }
+  .child:nth-of-type(2) { left: 80%; }
+
+  /* Dancing animation */
+  @keyframes dance {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(15px, -10px) rotate(10deg); }
+    50%  { transform: translate(0, -20px) rotate(-10deg); }
+    75%  { transform: translate(-15px, -10px) rotate(10deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+  .child.dancing {
+    animation: dance 1s infinite ease-in-out;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 20;
+  }
+  .buttons button {
+    margin: 5px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #ff69b4;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<audio id="music" loop>
+  <source src="/Happy birthday to you ji Song, New Birthday Status Video , happy birthday wishes  जनमदन.mp3" type="audio/mpeg">
+</audio>
+
+<h1 id="happyText">Happy Birthday Divya</h1>
+<div id="message">Click the cake to blow the candle!</div>
+
+<div class="cake" id="cake">
+  <div class="candle" id="candle">
+    <div class="flame" id="flame"></div>
+  </div>
+</div>
+
+<img class="child" id="child1" src="https://i.ibb.co/4N6qj5Y/girl1.png" alt="child" />
+<img class="child" id="child2" src="https://i.ibb.co/K0NQ3fC/girl2.png" alt="child" />
+
+<div class="buttons">
+  <button id="btnCelebrate">Celebrate Again 🎉</button>
+  <!-- <button id="btnDownload" disabled>Download PNG 📸</button> -->
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+class Firework {
+  constructor(x, y, colors) {
+    this.x = x; this.y = y; this.colors = colors;
+    this.particles = [];
+    for (let i = 0; i < 50; i++) {
+      this.particles.push({ x: x, y: y, angle: Math.random() * 2 * Math.PI, speed: Math.random() * 5 + 2, radius: Math.random() * 2 + 1, alpha: 1 });
+    }
+  }
+  update() {
+    this.particles.forEach(p => { p.x += Math.cos(p.angle) * p.speed; p.y += Math.sin(p.angle) * p.speed; p.alpha -= 0.01; });
+  }
+  draw() {
+    this.particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+      ctx.fillStyle = `rgba(${this.colors},${p.alpha})`;
+      ctx.fill();
+    });
+  }
+}
+
+let fireworks = [];
+let isBlown = false;
+
+const flame = document.getElementById('flame');
+const cake = document.getElementById('cake');
+const child1 = document.getElementById('child1');
+const child2 = document.getElementById('child2');
+const music = document.getElementById('music');
+const happyText = document.getElementById('happyText');
+const message = document.getElementById('message');
+
+function loop() {
+  ctx.fillStyle = 'rgba(255,230,240,0.2)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  if (isBlown) {
+    // spawn fireworks continuously
+    fireworks.push(new Firework(
+      Math.random() * canvas.width, 
+      Math.random() * canvas.height / 2, 
+      `${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)},${Math.floor(Math.random() * 255)}`
+    ));
+  }
+
+  // update and draw fireworks
+  fireworks.forEach((fw, index) => {
+    fw.update();
+    fw.draw();
+    fw.particles = fw.particles.filter(p => p.alpha > 0);
+    if (fw.particles.length === 0) fireworks.splice(index, 1);
+  });
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+
+// Dancing children continuously
+function danceChildren() {
+  if(isBlown){
+    child1.classList.add('dancing');
+    child2.classList.add('dancing');
+  } else {
+    child1.classList.remove('dancing');
+    child2.classList.remove('dancing');
+  }
+  requestAnimationFrame(danceChildren);
+}
+
+danceChildren();
+
+cake.addEventListener('click', ()=>{
+  if(!isBlown){
+    // hide candle entirely
+    document.getElementById('candle').style.display = 'none';
+    document.getElementById('message').style.display = 'none';
+    happyText.style.opacity = 2;
+    isBlown = true;
+    music.play();
+  }
+});
+
+
+document.getElementById('btnCelebrate').addEventListener('click', ()=>{
+  fireworks = [];
+  flame.style.display='block';
+  isBlown=false;
+  music.pause();
+  music.currentTime=0;
+  happyText.style.opacity = 0;
+  message.textContent = 'Click the cake to blow the candle!';
+});
+
+document.getElementById('btnDownload').addEventListener('click', ()=>{
+  html2canvas(document.body).then(canvas=>{
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'HappyBirthdayDivya.png';
+    a.click();
+  });
+});
+</script>
+</body>
+</html>
